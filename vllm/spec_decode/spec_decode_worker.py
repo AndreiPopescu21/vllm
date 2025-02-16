@@ -12,6 +12,8 @@ from vllm.config import ParallelConfig, SpeculativeConfig, VllmConfig
 from vllm.distributed.communication_op import broadcast_tensor_dict
 from vllm.logger import init_logger
 from vllm.model_executor.layers.rejection_sampler import RejectionSampler
+from vllm.model_executor.layers.temperature_rejection_sampler import TemperatureRejectionSampler
+from vllm.model_executor.layers.top_p_speculative_sampler import TopPSpeculativeSampler
 from vllm.model_executor.layers.sampler import SamplerOutput
 from vllm.model_executor.layers.spec_decode_base_sampler import (
     SpecDecodeBaseSampler, SpecDecodeStochasticBaseSampler)
@@ -198,6 +200,10 @@ class SpecDecodeWorker(LoraNotSupportedWorkerBase):
         spec_decode_sampler: SpecDecodeBaseSampler = None
         if draft_token_acceptance_method == "rejection_sampler":
             spec_decode_sampler = RejectionSampler()
+        elif draft_token_acceptance_method == "temperature_rejection_sampler":
+            spec_decode_sampler = TemperatureRejectionSampler()
+        elif draft_token_acceptance_method == 'top_p_speculative_sampler':
+            spec_decode_sampler = TopPSpeculativeSampler()
         elif draft_token_acceptance_method == "typical_acceptance_sampler":
             spec_decode_sampler = TypicalAcceptanceSampler(
                 posterior_threshold=\
