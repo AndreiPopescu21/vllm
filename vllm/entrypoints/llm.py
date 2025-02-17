@@ -189,7 +189,6 @@ class LLM:
         Note: if enforce_eager is unset (enforce_eager is None)
         it defaults to False.
         '''
-
         if "disable_log_stats" not in kwargs:
             kwargs["disable_log_stats"] = True
 

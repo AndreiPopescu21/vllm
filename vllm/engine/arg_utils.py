@@ -209,6 +209,8 @@ class EngineArgs:
 
     additional_config: Optional[Dict[str, Any]] = None
 
+    spec_sampling_temperature: float = 1.0
+
     def __post_init__(self):
         if not self.tokenizer:
             self.tokenizer = self.model
@@ -1222,6 +1224,7 @@ class EngineArgs:
             typical_acceptance_sampler_posterior_alpha=self.
             typical_acceptance_sampler_posterior_alpha,
             disable_logprobs=self.disable_logprobs_during_spec_decoding,
+            spec_sampling_temperature=self.spec_sampling_temperature
         )
 
         # Reminder: Please update docs/source/features/compatibility_matrix.md

@@ -1504,6 +1504,16 @@ class SchedulerConfig:
 
     chunked_prefill_enabled: bool = field(init=False)
 
+    max_num_partial_prefills: int = 1
+
+    # Maximum number of "very long prompt" sequences that can be prefilled
+    # concurrently (long is defined by long_prefill_threshold)
+    max_long_partial_prefills: int = 1
+
+    # calculate context length that determines which sequences are
+    # considered "long"
+    long_prefill_token_threshold: int = 0
+
     def compute_hash(self) -> str:
         """
         WARNING: Whenever a new field is added to this config,
@@ -1687,6 +1697,7 @@ class SpeculativeConfig:
         typical_acceptance_sampler_posterior_threshold: Optional[float],
         typical_acceptance_sampler_posterior_alpha: Optional[float],
         disable_logprobs: Optional[bool],
+        spec_sampling_temperature: float = 1.0,
     ) -> Optional["SpeculativeConfig"]:
         """Create a SpeculativeConfig if possible, else return None.
 
@@ -1876,6 +1887,7 @@ class SpeculativeConfig:
                 typical_acceptance_sampler_posterior_alpha,
             disable_logprobs=disable_logprobs,
             disable_log_stats=disable_log_stats,
+            spec_sampling_temperature=spec_sampling_temperature,
         )
 
     @staticmethod
@@ -1983,6 +1995,7 @@ class SpeculativeConfig:
         typical_acceptance_sampler_posterior_alpha: float,
         disable_logprobs: bool,
         disable_log_stats: bool,
+        spec_sampling_temperature: float = 1.0,
     ):
         """Create a SpeculativeConfig object.
 
@@ -2033,6 +2046,7 @@ class SpeculativeConfig:
             typical_acceptance_sampler_posterior_alpha
         self.disable_logprobs = disable_logprobs
         self.disable_log_stats = disable_log_stats
+        self.spec_sampling_temperature = spec_sampling_temperature
 
         self._verify_args()
 

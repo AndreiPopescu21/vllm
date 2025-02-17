@@ -109,6 +109,7 @@ def create_spec_worker(*args, **kwargs) -> "SpecDecodeWorker":
         typical_acceptance_sampler_posterior_alpha,
         disable_logprobs=speculative_config.disable_logprobs,
         disable_log_stats=speculative_config.disable_log_stats,
+        spec_sampling_temperature=speculative_config.spec_sampling_temperature
     )
 
     return spec_decode_worker
@@ -154,6 +155,7 @@ class SpecDecodeWorker(LoraNotSupportedWorkerBase):
         typical_acceptance_sampler_posterior_alpha: float,
         disable_logprobs: bool,
         disable_log_stats: bool,
+        spec_sampling_temperature: int=1,
     ) -> "SpecDecodeWorker":
 
         allow_zero_draft_token_step = True
@@ -198,10 +200,11 @@ class SpecDecodeWorker(LoraNotSupportedWorkerBase):
                     type(proposer_worker))
 
         spec_decode_sampler: SpecDecodeBaseSampler = None
+        print(spec_sampling_temperature)
         if draft_token_acceptance_method == "rejection_sampler":
             spec_decode_sampler = RejectionSampler()
         elif draft_token_acceptance_method == "temperature_rejection_sampler":
-            spec_decode_sampler = TemperatureRejectionSampler()
+            spec_decode_sampler = TemperatureRejectionSampler(spec_sampling_temperature)
         elif draft_token_acceptance_method == 'top_p_speculative_sampler':
             spec_decode_sampler = TopPSpeculativeSampler()
         elif draft_token_acceptance_method == "typical_acceptance_sampler":
