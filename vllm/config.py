@@ -1698,6 +1698,8 @@ class SpeculativeConfig:
         typical_acceptance_sampler_posterior_alpha: Optional[float],
         disable_logprobs: Optional[bool],
         spec_sampling_temperature: float = 1.0,
+        p: float = 0.95,
+        filter_value: float = -float('inf')
     ) -> Optional["SpeculativeConfig"]:
         """Create a SpeculativeConfig if possible, else return None.
 
@@ -1888,6 +1890,8 @@ class SpeculativeConfig:
             disable_logprobs=disable_logprobs,
             disable_log_stats=disable_log_stats,
             spec_sampling_temperature=spec_sampling_temperature,
+            p=p,
+            filter_value=filter_value
         )
 
     @staticmethod
@@ -1996,6 +2000,8 @@ class SpeculativeConfig:
         disable_logprobs: bool,
         disable_log_stats: bool,
         spec_sampling_temperature: float = 1.0,
+        p: float = 0.95,
+        filter_value: float = -float('inf'),
     ):
         """Create a SpeculativeConfig object.
 
@@ -2047,6 +2053,8 @@ class SpeculativeConfig:
         self.disable_logprobs = disable_logprobs
         self.disable_log_stats = disable_log_stats
         self.spec_sampling_temperature = spec_sampling_temperature
+        self.p=p
+        self.filter_value=filter_value
 
         self._verify_args()
 
@@ -2068,7 +2076,8 @@ class SpeculativeConfig:
         if (self.draft_token_acceptance_method != 'rejection_sampler'
                 and self.draft_token_acceptance_method
                 != 'typical_acceptance_sampler' and self.draft_token_acceptance_method != 'temperature_rejection_sampler'
-                and self.draft_token_acceptance_method != 'top_p_speculative_sampler'):
+                and self.draft_token_acceptance_method != 'top_p_speculative_sampler' and
+                self.draft_token_acceptance_method != 'min_p_sampler'):
             raise ValueError(
                 "Expected draft_token_acceptance_method to be either "
                 "rejection_sampler or typical_acceptance_sampler. Instead it "

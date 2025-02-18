@@ -211,6 +211,9 @@ class EngineArgs:
 
     spec_sampling_temperature: float = 1.0
 
+    p: float = 0.95
+    filter_value: float = -float('inf')
+
     def __post_init__(self):
         if not self.tokenizer:
             self.tokenizer = self.model
@@ -1224,7 +1227,9 @@ class EngineArgs:
             typical_acceptance_sampler_posterior_alpha=self.
             typical_acceptance_sampler_posterior_alpha,
             disable_logprobs=self.disable_logprobs_during_spec_decoding,
-            spec_sampling_temperature=self.spec_sampling_temperature
+            spec_sampling_temperature=self.spec_sampling_temperature,
+            p=self.p,
+            filter_value=self.filter_value,
         )
 
         # Reminder: Please update docs/source/features/compatibility_matrix.md

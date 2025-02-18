@@ -13,6 +13,7 @@ from vllm.distributed.communication_op import broadcast_tensor_dict
 from vllm.logger import init_logger
 from vllm.model_executor.layers.rejection_sampler import RejectionSampler
 from vllm.model_executor.layers.temperature_rejection_sampler import TemperatureRejectionSampler
+from vllm.model_executor.layers.min_p_sampler import MinPSampler
 from vllm.model_executor.layers.top_p_speculative_sampler import TopPSpeculativeSampler
 from vllm.model_executor.layers.sampler import SamplerOutput
 from vllm.model_executor.layers.spec_decode_base_sampler import (
@@ -109,7 +110,10 @@ def create_spec_worker(*args, **kwargs) -> "SpecDecodeWorker":
         typical_acceptance_sampler_posterior_alpha,
         disable_logprobs=speculative_config.disable_logprobs,
         disable_log_stats=speculative_config.disable_log_stats,
-        spec_sampling_temperature=speculative_config.spec_sampling_temperature
+        spec_sampling_temperature=speculative_config.spec_sampling_temperature,
+        p=speculative_config.p,
+        filter_value=speculative_config.filter_value,
+
     )
 
     return spec_decode_worker
@@ -156,6 +160,8 @@ class SpecDecodeWorker(LoraNotSupportedWorkerBase):
         disable_logprobs: bool,
         disable_log_stats: bool,
         spec_sampling_temperature: int=1,
+        p: float=0.05, 
+        filter_value:float =-float('inf')
     ) -> "SpecDecodeWorker":
 
         allow_zero_draft_token_step = True
@@ -200,13 +206,14 @@ class SpecDecodeWorker(LoraNotSupportedWorkerBase):
                     type(proposer_worker))
 
         spec_decode_sampler: SpecDecodeBaseSampler = None
-        print(spec_sampling_temperature)
         if draft_token_acceptance_method == "rejection_sampler":
             spec_decode_sampler = RejectionSampler()
+        elif draft_token_acceptance_method == "min_p_sampler":
+            spec_decode_sampler = MinPSampler(p, filter_value)
         elif draft_token_acceptance_method == "temperature_rejection_sampler":
             spec_decode_sampler = TemperatureRejectionSampler(spec_sampling_temperature)
         elif draft_token_acceptance_method == 'top_p_speculative_sampler':
-            spec_decode_sampler = TopPSpeculativeSampler()
+            spec_decode_sampler = TopPSpeculativeSampler(p)
         elif draft_token_acceptance_method == "typical_acceptance_sampler":
             spec_decode_sampler = TypicalAcceptanceSampler(
                 posterior_threshold=\
