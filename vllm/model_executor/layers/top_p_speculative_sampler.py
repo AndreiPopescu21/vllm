@@ -8,10 +8,6 @@ class TopPSpeculativeSampler(RejectionSampler):
     we restrict the candidates to the smallest set of tokens with cumulative probability
     at least top_p. This can help mitigate issues like overconfidence and improve the quality
     of recovered tokens.
-    
-    References:
-      - The Curious Case of Neural Text Degeneration,
-        https://arxiv.org/abs/1904.09751
     """
     def __init__(self, top_p: float = 0.9, **kwargs):
         super().__init__(**kwargs)

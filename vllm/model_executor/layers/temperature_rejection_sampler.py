@@ -12,14 +12,6 @@ class TemperatureRejectionSampler(RejectionSampler):
     
     This modification can help control the trade-off between fidelity to the target model
     and diversity in the generated text.
-    
-    References:
-      - Accelerating Large Language Model Decoding with Speculative Sampling,
-        https://arxiv.org/abs/2302.01318
-      - The Curious Case of Neural Text Degeneration,
-        https://arxiv.org/abs/1904.09751
-      - Fine-Tuning Language Models from Human Preferences,
-        https://arxiv.org/abs/1909.08593
     """
     def __init__(self, temperature: float = 1.0, **kwargs):
         super().__init__(**kwargs)
